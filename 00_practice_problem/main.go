@@ -49,7 +49,7 @@ func pizzacut(path string) ([]string, int, int, int, int) {
 }
 
 func main() {
-	pizza, row, col, minIngredient, maxArea = pizzacut("a_example.in")
+	pizza, row, col, minIngredient, maxArea = pizzacut("b_small.in")
 
 	for i := range pizza {
 		beg := 0
@@ -64,23 +64,28 @@ func main() {
 				tomato++
 			}
 			end++
-		}
 
-		if end-beg > maxArea { // if slide too big, remove one ingredient
-			if pizza[i][beg] == 77 {
-				mushroom--
-			} else if pizza[i][beg] == 84 {
-				tomato--
+			if end-beg > maxArea { // if slide too big, remove one ingredient
+				if pizza[i][beg] == 77 {
+					mushroom--
+				} else if pizza[i][beg] == 84 {
+					tomato--
+				}
+				beg++
 			}
-			beg++
-		}
 
-		if end-beg <= maxArea && mushroom >= minIngredient && tomato >= minIngredient {
-			results = append(results, []int{i, beg, i, end - 1}) // TODO: fix the one column only
-			beg = end
-			tomato = 0
-			mushroom = 0
+			if end-beg <= maxArea && mushroom >= minIngredient && tomato >= minIngredient {
+				results = append(results, []int{i, beg, i, end - 1}) // TODO: fix the one column only
+				beg = end
+				tomato = 0
+				mushroom = 0
+			}
 		}
 	}
-	fmt.Println(results)
+
+	// print results
+	fmt.Println(len(results))
+	for i := range results {
+		fmt.Println(results[i])
+	}
 }
