@@ -4,16 +4,21 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
 
-func pizzacut(path string) {
+// 84 is T
+// 77 is M
 
-	var r string
-	var c string
-	var l string
-	var h string
-	var pizza []string
+var row int
+var col int
+var minIngredient int // min ingredient
+var maxArea int
+var pizza []string
+var results [][]int
+
+func pizzacut(path string) ([]string, int, int, int, int) {
 
 	// read file
 	file, err := os.Open(path) // read file
@@ -34,15 +39,48 @@ func pizzacut(path string) {
 	arguments := strings.Split(firstline, " ") // split first line
 
 	// assign lines to argument
-	r = arguments[0]
-	c = arguments[1]
-	l = arguments[2]
-	h = arguments[3]
+	// _ as always sure to get good value
+	row, _ = strconv.Atoi(arguments[0])
+	col, _ = strconv.Atoi(arguments[1])
+	minIngredient, _ = strconv.Atoi(arguments[2])
+	maxArea, _ = strconv.Atoi(arguments[3])
 
-	fmt.Println(r + c + l + h)
-	fmt.Println(pizza)
+	return pizza, row, col, minIngredient, maxArea
 }
 
 func main() {
-	pizzacut("b_small.in")
+	pizza, row, col, minIngredient, maxArea = pizzacut("a_example.in")
+
+	for i := range pizza {
+		beg := 0
+		end := 0
+		mushroom := 0
+		tomato := 0
+
+		for end < col { // for
+			if pizza[i][end] == 77 {
+				mushroom++
+			} else if pizza[i][end] == 84 {
+				tomato++
+			}
+			end++
+		}
+
+		if end-beg > maxArea { // if slide too big, remove one ingredient
+			if pizza[i][beg] == 77 {
+				mushroom--
+			} else if pizza[i][beg] == 84 {
+				tomato--
+			}
+			beg++
+		}
+
+		if end-beg <= maxArea && mushroom >= minIngredient && tomato >= minIngredient {
+			results = append(results, []int{i, beg, i, end - 1}) // TODO: fix the one column only
+			beg = end
+			tomato = 0
+			mushroom = 0
+		}
+	}
+	fmt.Println(results)
 }
