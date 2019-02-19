@@ -18,7 +18,7 @@ var maxArea int
 var pizza []string
 var results [][]int
 
-func pizzacut(path string) ([]string, int, int, int, int) {
+func scanPizza(path string) ([]string, int, int, int, int) {
 
 	// read file
 	file, err := os.Open(path) // read file
@@ -48,9 +48,8 @@ func pizzacut(path string) ([]string, int, int, int, int) {
 	return pizza, row, col, minIngredient, maxArea
 }
 
-func main() {
-	pizza, row, col, minIngredient, maxArea = pizzacut("b_small.in")
-
+// calculate columns
+func calculateColumns(pizza []string, row, col, minIngredient, maxArea int) [][]int {
 	for i := range pizza {
 		beg := 0
 		end := 0
@@ -83,9 +82,23 @@ func main() {
 		}
 	}
 
-	// print results
+	return results
+}
+
+// print results
+func printResult(results [][]int) {
+	delim := " "
+	// print score
 	fmt.Println(len(results))
+	// print coordinates
 	for i := range results {
-		fmt.Println(results[i])
+		fmt.Println(strings.Trim(strings.Join(strings.Fields(fmt.Sprint(results[i])), delim), "[]"))
 	}
+
+}
+
+func main() {
+	pizza, row, col, minIngredient, maxArea = scanPizza("b_small.in")
+	calculateColumns(pizza, row, col, minIngredient, maxArea)
+	printResult(results)
 }
