@@ -2,7 +2,8 @@
 
 Team: SHA3-512
 
-Our current score: 869.714
+Our current score: 869.714 (5, 30, 46.233, 823.446) - horizontal search <br/> 
+                   867.465 (6, 28, 46.266, 821.165) - vertical search <br/> 
 
 Thw maximum Score: 1.050.057 <br/> 
 a_example(3,5) = 15 <br/>
