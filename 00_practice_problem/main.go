@@ -18,7 +18,6 @@ var pizza []string
 
 var resultsCol [][]int
 var resultsRow [][]int
-var results [][]int
 var filename = "b_small"
 
 func makePizza(path string) ([]string, int, int, int, int) {
@@ -53,6 +52,8 @@ func makePizza(path string) ([]string, int, int, int, int) {
 
 // calculate columns
 func calculateColumns(pizza []string, row, col, minIngredient, maxArea int) [][]int {
+	var results [][]int
+
 	for i := range pizza {
 		beg := 0
 		end := 0
@@ -104,6 +105,8 @@ func createColumns(pizza []string, col int) []string {
 
 // calculate slices (pizza must be in line)
 func calculateSlices(pizza []string, row, col, minIngredient, maxArea int, byRow bool) [][]int {
+	var results [][]int
+
 	for i := range pizza {
 		beg := 0
 		end := 0
@@ -138,7 +141,7 @@ func calculateSlices(pizza []string, row, col, minIngredient, maxArea int, byRow
 				if byRow {
 					results = append(results, []int{i, beg, i, end - 1})
 				} else {
-					results = append(results, []int{beg, i, end - 1, i}) // TODO: fix the one column only
+					results = append(results, []int{beg, i, end - 1, i})
 				}
 				beg = end
 				tomato = 0
@@ -179,7 +182,9 @@ func printResult(results [][]int) {
 func main() {
 	pizza, row, col, minIngredient, maxArea = makePizza(filename)
 	colPizza := createColumns(pizza, col)
-	// calculateSlices(pizza, row, col, minIngredient, maxArea, true)
-	calculateSlices(colPizza, row, col, minIngredient, maxArea, false)
-	printResult(results)
+
+	// rowResults := calculateSlices(pizza, row, col, minIngredient, maxArea, true)
+	colResults := calculateSlices(colPizza, row, col, minIngredient, maxArea, false)
+
+	printResult(colResults)
 }
