@@ -10,18 +10,21 @@ import (
 
 // 84 is T
 // 77 is M
-
 var row int
 var col int
 var minIngredient int // min ingredient
 var maxArea int
 var pizza []string
-var results [][]int
 
-func scanPizza(path string) ([]string, int, int, int, int) {
+var resultsCol [][]int
+var resultsRow [][]int
+var results [][]int
+var filename = "b_small"
+
+func makePizza(path string) ([]string, int, int, int, int) {
 
 	// read file
-	file, err := os.Open(path) // read file
+	file, err := os.Open(path + ".in") // read file
 	if err != nil {
 		fmt.Print(err)
 	}
@@ -33,7 +36,7 @@ func scanPizza(path string) ([]string, int, int, int, int) {
 	firstline := bf.Text() // get first line of file
 
 	for bf.Scan() {
-		pizza = append(pizza, bf.Text()) // get pizza
+		pizza = append(pizza, bf.Text()) // get pizza, by default by rows
 	}
 
 	arguments := strings.Split(firstline, " ") // split first line
@@ -85,20 +88,98 @@ func calculateColumns(pizza []string, row, col, minIngredient, maxArea int) [][]
 	return results
 }
 
-// print results
+// create Columns
+func createColumns(pizza []string, col int) []string {
+	var newPizza []string
+
+	for i := 0; i < col; i++ {
+		var columnsPizza []byte
+		for j := range pizza {
+			columnsPizza = append(columnsPizza, pizza[j][i])
+		}
+		newPizza = append(newPizza, string(columnsPizza))
+	}
+	return newPizza
+}
+
+// calculate slices (pizza must be in line)
+func calculateSlices(pizza []string, row, col, minIngredient, maxArea int, byRow bool) [][]int {
+	for i := range pizza {
+		beg := 0
+		end := 0
+		mushroom := 0
+		tomato := 0
+
+		var last int
+		if byRow {
+			last = col
+		} else {
+			last = row
+		}
+
+		for end < last { // for
+			if pizza[i][end] == 77 {
+				mushroom++
+			} else if pizza[i][end] == 84 {
+				tomato++
+			}
+			end++
+
+			if end-beg > maxArea { // if slide too big, remove one ingredient
+				if pizza[i][beg] == 77 {
+					mushroom--
+				} else if pizza[i][beg] == 84 {
+					tomato--
+				}
+				beg++
+			}
+
+			if end-beg <= maxArea && mushroom >= minIngredient && tomato >= minIngredient {
+				if byRow {
+					results = append(results, []int{i, beg, i, end - 1})
+				} else {
+					results = append(results, []int{beg, i, end - 1, i}) // TODO: fix the one column only
+				}
+				beg = end
+				tomato = 0
+				mushroom = 0
+			}
+		}
+	}
+
+	return results
+}
+
+// print and write results
 func printResult(results [][]int) {
+	// create file
+	file, err := os.Create(filename + ".out")
+	defer file.Close()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	delim := " "
 	// print score
-	fmt.Println(len(results))
+	output := len(results)
+	fmt.Fprintln(file, output)
+	fmt.Println(output)
 	// print coordinates
 	for i := range results {
-		fmt.Println(strings.Trim(strings.Join(strings.Fields(fmt.Sprint(results[i])), delim), "[]"))
+		output := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(results[i])), delim), "[]")
+		// print to file
+		fmt.Fprintln(file, output)
+		// print to terminal
+		fmt.Println(output)
 	}
 
 }
 
 func main() {
-	pizza, row, col, minIngredient, maxArea = scanPizza("b_small.in")
-	calculateColumns(pizza, row, col, minIngredient, maxArea)
+	pizza, row, col, minIngredient, maxArea = makePizza(filename)
+	colPizza := createColumns(pizza, col)
+	// calculateSlices(pizza, row, col, minIngredient, maxArea, true)
+	calculateSlices(colPizza, row, col, minIngredient, maxArea, false)
 	printResult(results)
 }
